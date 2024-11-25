@@ -172,6 +172,7 @@ assert len(array_x) == len(array_y) == len(array_z)
 
 df = ak.to_rdataframe({"x": array_x, "y": array_y, "z": array_z})
 ~~~
+
 ### Construct histogram and profile models from a tuple
 
 The Histo1D(), Histo2D(), Histo3D(), Profile1D() and Profile2D() methods return
