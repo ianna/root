@@ -27,6 +27,30 @@ sum = df.Filter("x > 10").Sum("y")
 print(sum.GetValue())
 ~~~
 
+The function for Awkward → RDataFrame conversion is ak.to_rdataframe().
+
+The argument to this function requires a dictionary: { <column name string> : <awkwad array> }. This function always returns cppyy.gbl.ROOT.RDF.RInterface object.
+
+The arrays given for each column have to be equal length:
+
+~~~{.py}
+array_x = ak.Array(
+    [
+        {"x": [1.1, 1.2, 1.3]},
+        {"x": [2.1, 2.2]},
+        {"x": [3.1]},
+        {"x": [4.1, 4.2, 4.3, 4.4]},
+        {"x": [5.1]},
+    ]
+)
+array_y = ak.Array([1, 2, 3, 4, 5])
+array_z = ak.Array([[1.1], [2.1, 2.3, 2.4], [3.1], [4.1, 4.2, 4.3], [5.1]])
+
+assert len(array_x) == len(array_y) == len(array_z)
+
+df = ak.to_rdataframe({"x": array_x, "y": array_y, "z": array_z})
+~~~
+
 ### User code in the RDataFrame workflow
 
 #### C++ code
@@ -129,6 +153,24 @@ df = ROOT.RDF.FromNumpy({"x": x, "y": y})
 
 # Use RDataFrame as usual, e.g. write out a ROOT file
 df.Define("z", "x + y").Snapshot("tree", "file.root")
+~~~
+
+### Interoperability with [AwkwardArray](https://awkward-array.org/doc/main/user-guide/how-to-convert-rdataframe.html)
+
+The function for RDataFrame → Awkward conversion is ak.from_rdataframe(). The argument to this function accepts a tuple of strings that are the RDataFrame column names. By default this function returns ak.Array type.
+
+~~~{.py}
+import awkward as ak
+import ROOT
+
+array = ak.from_rdataframe(
+    df,
+    columns=(
+        "x",
+        "y",
+        "z",
+    ),
+)
 ~~~
 
 ### Construct histogram and profile models from a tuple
